@@ -1,0 +1,13 @@
+5 4 3
+Greenville 2
+Atlanta 0
+Charlotte 3
+Charleston 0
+Chicago 1
+Greenville Atlanta
+Charlotte Greenville
+Charleston Greenville
+Charleston Charlotte
+Chicago
+Greenville
+Greenville

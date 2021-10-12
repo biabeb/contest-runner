@@ -1,0 +1,3 @@
+The sum of 10 and 15 is 25
+The sum of 200 and 150 is 350
+The sum of 1 and 1 is 2

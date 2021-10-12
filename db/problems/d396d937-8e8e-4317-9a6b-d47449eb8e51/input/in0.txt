@@ -1,0 +1,11 @@
+5 3 2
+Calculus I
+Calculus II
+Geometry
+Art I
+Art II
+Calculus I -> Calculus II
+Geometry -> Calculus II
+Art I -> Art II
+Calculus I
+Geometry

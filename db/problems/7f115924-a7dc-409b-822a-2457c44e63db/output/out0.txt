@@ -1,0 +1,6 @@
+2
+Atlanta 1
+Charleston 2
+Charlotte 3
+Chicago 2
+Greenville 3
