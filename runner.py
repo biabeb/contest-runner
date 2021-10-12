@@ -4,6 +4,7 @@ import sys
 import subprocess
 import json
 import difflib
+import textwrap
 from pathlib import Path
 
 USAGE = """usage: runner run <problem name> <solution file> [<test index>]
@@ -22,6 +23,11 @@ class Problem:
         self.id = json['id']
         self.title = json['title']
         self.tests = json['tests']
+        self.description = json['description']
+        self.statement = json['statement']
+        self.input = json['input']
+        self.output = json['output']
+        self.constraints = json['constraints']
 
 
     def load_input(self, index: int):
@@ -86,28 +92,29 @@ def run_show_test(problem: Problem, test: int, solution: str):
         print('-----------end diff-----------')
 
 
+def load_problem(db, title):
+    for problem in db.values():
+        if problem.title == title:
+            return problem
+    sys.exit(f"error: unknown problem '{title}'")
+
 def main():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         sys.exit(USAGE)
     action = sys.argv[1]
-    problem_name = sys.argv[2]
 
     problem = None
 
     db = load_db()
-    for some_problem in db.values():
-        if some_problem.title == problem_name:
-            problem = some_problem
-
-    if problem is None:
-        sys.exit(f"error: unknown problem '{problem_name}'")
 
     if action == 'run':
         if len(sys.argv) == 4:
+            problem = load_problem(db, sys.argv[2])
             solution_filename = sys.argv[3]
             for test_index in range(problem.tests):
                 run_show_test(problem, test_index, solution_filename)
         elif len(sys.argv) == 5:
+            problem = load_problem(db, sys.argv[2])
             solution_filename = sys.argv[3]
             test_index = int(sys.argv[4])
             run_show_test(problem, test_index, solution_filename)            
@@ -116,15 +123,56 @@ def main():
     elif action == 'input':
         if len(sys.argv) != 4:
             sys.exit(USAGE)
+        problem = load_problem(db, sys.argv[2])
         test_index = sys.argv[3]
 
         print(problem.load_input(int(test_index)), end = '')
     elif action == 'output':
         if len(sys.argv) != 4:
             sys.exit(USAGE)
+        problem = load_problem(db, sys.argv[2])
         test_index = sys.argv[3]
 
         print(problem.load_output(int(test_index)), end = '')
+    elif action == 'list':
+        for problem in db.values():
+            print(problem.title)
+    elif action == 'desc':
+        if len(sys.argv) != 3:
+            sys.exit(USAGE)
+        problem = load_problem(db, sys.argv[2])
+
+        print(problem.title)
+        print()
+        print("Description:")
+        print(textwrap.indent(problem.description, '  '))
+        print("Statement:")
+        print(textwrap.indent(problem.statement, '  '))
+        print("Input:")
+        print(textwrap.indent(problem.input, '  '))
+        print("Output:")
+        print(textwrap.indent(problem.output, '  '))
+        print("Constraints:")
+        print(textwrap.indent(problem.constraints.replace("&lt;", "<").replace("&gt;", ">").replace("&le;", "<=").replace("&ge;", ">="), '  '))
+    elif action == 'dump':
+        for problem in db.values():
+            md = f"""# {problem.title}
+## Description
+{problem.description}
+
+## Statement
+{problem.statement}
+
+## Input
+{problem.input}
+
+## Output
+{problem.output}
+
+## Constraints
+{problem.constraints}"""
+            with open(f'{problem.title}.md', 'w') as f:
+                f.write(md)
     else:
         sys.exit(f"error: unknown action '{action}'")
 
