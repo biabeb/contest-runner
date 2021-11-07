@@ -75,21 +75,25 @@ def run_test(problem: Problem, test: int, solution: str):
 
     completed = subprocess.run(['python', solution], input = input_text, capture_output = True, text = True)
 
-    return completed.stdout == output_text, difflib.unified_diff(completed.stdout.splitlines(keepends = True), output_text.splitlines(keepends = True), fromfile = 'your solution\'s output', tofile = 'expected output')
+    return completed.stdout == output_text, difflib.unified_diff(completed.stdout.splitlines(keepends = True), output_text.splitlines(keepends = True), fromfile = 'your solution\'s output', tofile = 'expected output'), completed.stderr
 
 
 def run_show_test(problem: Problem, test: int, solution: str):
-    justified = str(test_index).rjust(len(str(problem.tests - 1)))
+    justified = str(test).rjust(len(str(problem.tests - 1)))
 
-    passed, diff = run_test(problem, test_index, solution_filename)
+    passed, diff, stderr = run_test(problem, test, solution)
 
     if passed:
         print(f'Test case {justified}: PASS')
     else:
         print(f'Test case {justified}: FAIL')
-        print('-------------diff-------------')
+        if stderr != '':
+            print('---------------stderr-------------')
+            print(stderr)
+            print('-------------end stderr------------')
+        print('----------output diff----------')
         print(''.join(diff), end = '')
-        print('-----------end diff-----------')
+        print('--------end output diff--------')
 
 
 def load_problem(db, title):
