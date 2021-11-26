@@ -1,0 +1,1 @@
+python runner.py run "$(cat problem)" problem_solution.py
